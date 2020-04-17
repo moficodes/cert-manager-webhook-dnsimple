@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "cert-manager-webhook-ovh.fullname" . }}
+  name: {{ include "dnsimple-webhook.fullname" . }}
   labels:
-    app: {{ include "cert-manager-webhook-ovh.name" . }}
-    chart: {{ include "cert-manager-webhook-ovh.chart" . }}
+    app: {{ include "dnsimple-webhook.name" . }}
+    chart: {{ include "dnsimple-webhook.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 ---
@@ -14,11 +14,11 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: {{ include "cert-manager-webhook-ovh.fullname" . }}:webhook-authentication-reader
+  name: {{ include "dnsimple-webhook.fullname" . }}:webhook-authentication-reader
   namespace: kube-system
   labels:
-    app: {{ include "cert-manager-webhook-ovh.name" . }}
-    chart: {{ include "cert-manager-webhook-ovh.chart" . }}
+    app: {{ include "dnsimple-webhook.name" . }}
+    chart: {{ include "dnsimple-webhook.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
@@ -28,7 +28,7 @@ roleRef:
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "cert-manager-webhook-ovh.fullname" . }}
+    name: {{ include "dnsimple-webhook.fullname" . }}
     namespace: {{ .Release.Namespace }}
 ---
 # apiserver gets the auth-delegator role to delegate auth decisions to
@@ -36,10 +36,10 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "cert-manager-webhook-ovh.fullname" . }}:auth-delegator
+  name: {{ include "dnsimple-webhook.fullname" . }}:auth-delegator
   labels:
-    app: {{ include "cert-manager-webhook-ovh.name" . }}
-    chart: {{ include "cert-manager-webhook-ovh.chart" . }}
+    app: {{ include "dnsimple-webhook.name" . }}
+    chart: {{ include "dnsimple-webhook.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
@@ -49,17 +49,17 @@ roleRef:
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "cert-manager-webhook-ovh.fullname" . }}
+    name: {{ include "dnsimple-webhook.fullname" . }}
     namespace: {{ .Release.Namespace }}
 ---
 # Grant cert-manager permission to validate using our apiserver
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: {{ include "cert-manager-webhook-ovh.fullname" . }}:domain-solver
+  name: {{ include "dnsimple-webhook.fullname" . }}:domain-solver
   labels:
-    app: {{ include "cert-manager-webhook-ovh.name" . }}
-    chart: {{ include "cert-manager-webhook-ovh.chart" . }}
+    app: {{ include "dnsimple-webhook.name" . }}
+    chart: {{ include "dnsimple-webhook.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 rules:
@@ -73,18 +73,53 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "cert-manager-webhook-ovh.fullname" . }}:domain-solver
+  name: {{ include "dnsimple-webhook.fullname" . }}:domain-solver
   labels:
-    app: {{ include "cert-manager-webhook-ovh.name" . }}
-    chart: {{ include "cert-manager-webhook-ovh.chart" . }}
+    app: {{ include "dnsimple-webhook.name" . }}
+    chart: {{ include "dnsimple-webhook.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "cert-manager-webhook-ovh.fullname" . }}:domain-solver
+  name: {{ include "dnsimple-webhook.fullname" . }}:domain-solver
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
     name: {{ .Values.certManager.serviceAccountName }}
     namespace: {{ .Values.certManager.namespace }}
+---
+# The missing rbac of the official webhook-example
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ include "dnsimple-webhook.fullname" . }}:secret-reader
+  labels:
+    app: {{ include "dnsimple-webhook.name" . }}
+    chart: {{ include "dnsimple-webhook.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - "secrets"
+  resourceNames:
+  - "dnspod-credentials"
+  verbs:
+  - "get"
+  - "watch"
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "dnsimple-webhook.fullname" . }}:secret-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "dnsimple-webhook.fullname" . }}:secret-reader
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: {{ include "dnsimple-webhook.fullname" . }}
+    namespace: {{ .Release.Namespace }}

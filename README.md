@@ -12,7 +12,7 @@ This is a webhook solver for [OVH](http://www.ovh.com).
 Choose a unique group name to identify your company or organization (for example `acme.mycompany.example`).
 
 ```bash
-helm install ./deploy/cert-manager-webhook-ovh \
+helm install ./deploy/dnsimple-webhook \
  --set groupName='<YOUR_UNIQUE_GROUP_NAME>'
 ```
 
@@ -33,13 +33,13 @@ If you customized the installation of cert-manager, you may need to also set the
       --from-literal=applicationSecret='<OVH_APPLICATION_SECRET>'
     ```
 
-3. Grant permission to get the secret to the `cert-manager-webhook-ovh` service account:
+3. Grant permission to get the secret to the `dnsimple-webhook` service account:
 
     ```yaml
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
-      name: cert-manager-webhook-ovh:secret-reader
+      name: dnsimple-webhook:secret-reader
     rules:
     - apiGroups: [""]
       resources: ["secrets"]
@@ -49,15 +49,15 @@ If you customized the installation of cert-manager, you may need to also set the
     apiVersion: rbac.authorization.k8s.io/v1beta1
     kind: RoleBinding
     metadata:
-      name: cert-manager-webhook-ovh:secret-reader
+      name: dnsimple-webhook:secret-reader
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: Role
-      name: cert-manager-webhook-ovh:secret-reader
+      name: dnsimple-webhook:secret-reader
     subjects:
     - apiGroup: ""
       kind: ServiceAccount
-      name: cert-manager-webhook-ovh
+      name: dnsimple-webhook
     ```
 
 4. Create a certificate issuer:
