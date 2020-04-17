@@ -1,0 +1,7 @@
+{
+  "accessTokenSecretRef": {
+    "name": "<secret-name>",
+    "key": "accessToken"
+  },
+  "accountId": "<account-id>"
+}
