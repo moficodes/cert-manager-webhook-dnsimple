@@ -1,10 +1,10 @@
 # OVH Webhook for Cert Manager
 
-This is a webhook solver for [OVH](http://www.ovh.com).
+This is a webhook solver for [dnsimple](https://dnsimple.com/).
 
 ## Prerequisites
 
-* [cert-manager](https://github.com/jetstack/cert-manager) version 0.11.0 or higher (*tested with 0.12.0*):
+* [cert-manager](https://github.com/jetstack/cert-manager) version 0.13.0 or higher (*tested with 0.14.0*):
   - [Installing on Kubernetes](https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm)
 
 ## Installation
