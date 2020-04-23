@@ -10,7 +10,7 @@ verify:
 	go test -v .
 
 build:
-	docker build -t "$(IMAGE_NAME):$(IMAGE_TAG)" .
+	DOCKER_BUILDKIT=1 docker build -t "$(IMAGE_NAME):$(IMAGE_TAG)" .
 
 push:
 	docker push "$(IMAGE_NAME):$(IMAGE_TAG)"
