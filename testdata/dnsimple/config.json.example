@@ -1,6 +1,6 @@
 {
   "accessTokenSecretRef": {
-    "name": "<secret-name>",
+    "name": "dnsimple-credentials",
     "key": "accessToken"
   },
   "accountId": "<account-id>"

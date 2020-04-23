@@ -1,4 +1,4 @@
-# OVH Webhook for Cert Manager
+# DNSIMPLE Webhook for Cert Manager
 
 This is a webhook solver for [dnsimple](https://dnsimple.com/).
 
@@ -66,6 +66,9 @@ helm install dnsimple dnsimple-webhook/cert-manager-webhook-dnsimple -n <custom-
     ```
 
 ## Certificate
+Lets encrypt can automatically issue certs based on annotations. As discussed [here](https://cert-manager.io/docs/usage/ingress/#how-it-works)
+
+Or you can manually deploy a cert.
 
 Issue a certificate:
 
@@ -99,7 +102,7 @@ Before you can run the test suite, you need to download the test binaries:
 ./scripts/fetch-test-binaries.sh
 ```
 
-Then duplicate the `.sample` files in `testdata/ovh/` and update the configuration with the appropriate OVH credentials.
+Then duplicate the `*.sample` files in `testdata/dnsimple/` and update the configuration with the appropriate DNSIMPLE credentials.
 
 Now you can run the test suite with:
 

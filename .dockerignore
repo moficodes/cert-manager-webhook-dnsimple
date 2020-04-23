@@ -1,2 +1,4 @@
 /.git
 /_out
+config.json
+dnsimple-credentials.yaml
