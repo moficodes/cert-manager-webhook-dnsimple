@@ -8,59 +8,39 @@ This is a webhook solver for [dnsimple](https://dnsimple.com/).
   - [Installing on Kubernetes](https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm)
 
 ## Installation
-
-Choose a unique group name to identify your company or organization (for example `acme.mycompany.example`).
-
+Add the helm repo
 ```bash
-helm install ./deploy/dnsimple-webhook \
- --set groupName='<YOUR_UNIQUE_GROUP_NAME>'
+helm repo add dnsimple-webhook https://moficodes.github.io/cert-manager-webhook-dnsimple
+```
+
+Check that the repo was added
+```bash
+helm repo list
+```
+
+Install the helm chart
+```bash
+helm install dnsimple dnsimple-webhook/cert-manager-webhook-dnsimple -n cert-manager
 ```
 
 If you customized the installation of cert-manager, you may need to also set the `certManager.namespace` and `certManager.serviceAccountName` values.
+```
+helm install dnsimple dnsimple-webhook/cert-manager-webhook-dnsimple -n <custom-ns> --set certManager.namespace=<custom-ns> --set certManager.serviceAccountName=<custom-sa>
+```
+
 
 ## Issuer
 
-1. [Create a new OVH API key](https://docs.ovh.com/gb/en/customer/first-steps-with-ovh-api/) with the following rights:
-    * `GET /domain/zone/*`
-    * `PUT /domain/zone/*`
-    * `POST /domain/zone/*`
-    * `DELETE /domain/zone/*`
+1. [Create a new DNSimple Api Token](https://support.dnsimple.com/articles/api-access-token/).
 
 2. Create a secret to store your application secret:
 
     ```bash
-    kubectl create secret generic ovh-credentials \
-      --from-literal=applicationSecret='<OVH_APPLICATION_SECRET>'
+    kubectl create secret generic dnsimple-credentials \
+      --from-literal=accessToken='<DNSimple-access-token>'
     ```
 
-3. Grant permission to get the secret to the `dnsimple-webhook` service account:
-
-    ```yaml
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: Role
-    metadata:
-      name: dnsimple-webhook:secret-reader
-    rules:
-    - apiGroups: [""]
-      resources: ["secrets"]
-      resourceNames: ["ovh-credentials"]
-      verbs: ["get", "watch"]
-    ---
-    apiVersion: rbac.authorization.k8s.io/v1beta1
-    kind: RoleBinding
-    metadata:
-      name: dnsimple-webhook:secret-reader
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: Role
-      name: dnsimple-webhook:secret-reader
-    subjects:
-    - apiGroup: ""
-      kind: ServiceAccount
-      name: dnsimple-webhook
-    ```
-
-4. Create a certificate issuer:
+3. Create a certificate issuer:
 
     ```yaml
     apiVersion: certmanager.k8s.io/v1alpha1
@@ -76,15 +56,13 @@ If you customized the installation of cert-manager, you may need to also set the
         solvers:
         - dns01:
             webhook:
-              groupName: '<YOUR_UNIQUE_GROUP_NAME>'
-              solverName: ovh
+              groupName: 'acme.moficodes.com'
+              solverName: dnsimple
               config:
-                endpoint: ovh-eu
-                applicationKey: '<OVH_APPLICATION_KEY>'
-                applicationSecretRef:
-                  key: applicationSecret
-                  name: ovh-credentials
-                consumerKey: '<OVH_CONSUMER_KEY>'
+                accountId: '<account-id>'
+                accessTokenSecretRef:
+                  key: accessToken
+                  name: dnsimple-credentials
     ```
 
 ## Certificate
